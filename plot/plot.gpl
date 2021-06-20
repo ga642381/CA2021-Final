@@ -1,0 +1,4 @@
+set terminal png
+set output './plot/png/test.png'
+
+splot "./plot/dat/plot.dat" t "3D Plot" with pm3d
