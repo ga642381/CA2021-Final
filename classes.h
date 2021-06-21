@@ -20,6 +20,29 @@ double operator|(const vector<double> &, const vector<double> &);
 double operator*(const vector<double> &, const vector<double> &);
 
 /*TODO Matrix WriteableMatrix PoissonMatrix UpperMatrix LowerMatrix*/
+class Matrix {
+public:
+    vector<vector<int> > HashMatrix;
+    virtual int Size() = 0;
+    virtual double Get(int, int) = 0;
+    virtual vector<double> operator*(const vector<double>&) = 0;
+};
+
+class PoissonMatrix : public Matrix {
+private:
+    int dim;
+    int n;
+    double diagonal;
+    double tridiagonal;
+    double identity;
+public:
+    PoissonMatrix(int);
+    ~PoissonMatrix();
+    int Size();
+    double Get(int, int);
+    void InitHashMatrix();
+    vector<double> operator*(const vector<double>&);
+};
 
 class Vectors
 {
