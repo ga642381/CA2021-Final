@@ -32,6 +32,11 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
         return 0;
     else
         return 0;
+
+    PoissonMatrix B(n);
+
+
+    B.InitHashMatrix();
 }
 
 int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved)

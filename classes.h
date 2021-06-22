@@ -28,6 +28,11 @@ public:
     virtual vector<double> operator*(const vector<double>&) = 0;
 };
 
+class WriteableMatrix : public Matrix {
+public:
+    virtual void Set(int, int, double) = 0;
+};
+
 class PoissonMatrix : public Matrix {
 private:
     int dim;
@@ -43,7 +48,35 @@ public:
     void InitHashMatrix();
     vector<double> operator*(const vector<double>&);
 };
+class LowerMatrix : public WriteableMatrix {
+private:
+    int dim;
+    int n;
+public:
+    LowerMatrix(int);
+    ~LowerMatrix();
+    vector<double> diagonal;
+    vector<double> tridiagonal;
+    vector<double> identity;
+    int Size();
+    double Get(int, int);
+    void Set(int, int, double);
+    vector<double> operator*(const vector<double>&);
+};
 
+class UpperMatrix : public LowerMatrix {
+private:
+    int dim;
+    int n;
+public:
+    UpperMatrix(int);
+    ~UpperMatrix();
+    double Get(int, int);
+    void Set(int, int, double);
+    vector<double> operator*(const vector<double>&);
+};
+
+/*================================Matrix end here===================================================================*/
 class Vectors
 {
 public:

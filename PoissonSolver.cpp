@@ -37,6 +37,8 @@ int main(int argc, char const *argv[])
 
     /* === Initialize === */
     PoissonMatrix A(M);
+    LowerMatrix L(M);
+    UpperMatrix U(M);
     Boundary B(M, func);
     Startvector X(M, 0.0);
     Algorithms Algs(M);
