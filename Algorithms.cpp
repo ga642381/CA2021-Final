@@ -1,4 +1,4 @@
-#include "classes.h"
+﻿#include "classes.h"
 
 Algorithms::Algorithms(int n)
 {
@@ -10,16 +10,25 @@ Algorithms::Algorithms(int n)
 
 Algorithms::~Algorithms() {}
 
-int Algorithms::MultiGridMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved, string method)
+int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double> &b, const vector<double> &solved, string method)
 {
     // MultiGrid Method
     // To be implemented
     // input should be Matrix
+    int numberOfGrids = 2, VW = 0, n = 0;
     if (method == "Two-Grid")
+    {
+        numberOfGrids = 1;
+        VW = 0;
+        n = ((int)sqrt(dim) + 1) / 2 - 1;
+        VW = VW + numberOfGrids + n;
+    }
+
+
         return 0;
-    else if (method == "V-Cycle")
+    if (method == "V-Cycle")                          //不吃"else if"
         return 0;
-    else if (method == "W-Cycle")
+    if (method == "W-Cycle")
         return 0;
     else
         return 0;
@@ -65,3 +74,4 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
     }
     return steps;
 }
+
