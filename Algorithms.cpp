@@ -10,6 +10,7 @@ Algorithms::Algorithms(int n)
 
 Algorithms::~Algorithms() {}
 
+
 int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double> &b, const vector<double> &solved, string method)
 {
     // MultiGrid Method
@@ -32,9 +33,14 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
         return 0;
     else
         return 0;
-
+ 
+    
+    
     PoissonMatrix B(n);
-
+    LowerMatrix L(n);
+    UpperMatrix U(n);
+    B.InitHashMatrix();
+    //modifiedIncompleteLU(B, L, U);   -->occurred error while imorting this function in algorithm
 
     B.InitHashMatrix();
 }
@@ -79,4 +85,6 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
     }
     return steps;
 }
+
+
 
