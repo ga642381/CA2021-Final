@@ -36,6 +36,7 @@ int main(int argc, char const *argv[])
     M = M - 1;
 
     /* === Initialize === */
+    PoissonMatrix A(M);
     Boundary B(M, func);
     Startvector X(M, 0.0);
     Algorithms Algs(M);
@@ -53,17 +54,17 @@ int main(int argc, char const *argv[])
     if (alg_num == 2)
     {
         method = "Two-Grid";
-        steps = Algs.MultiGridMethod(X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);
     }
     if (alg_num == 3)
     {
         method = "V-Cycle";
-        steps = Algs.MultiGridMethod(X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);                //different about run & algs? 
     }
     if (alg_num == 4)
     {
         method = "W-Cycle";
-        steps = Algs.MultiGridMethod(X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);
     }
 
     /* === Information ===*/
