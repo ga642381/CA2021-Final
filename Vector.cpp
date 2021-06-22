@@ -2,10 +2,10 @@
 
 double Vectors::f(double x, double y, int k)
 {
-	sadfjksl
-    double vwqeral;
-    if (k ==cxzvzcx 1)
-        val = sadfas-4.0;
+	
+    double val;
+    if (k == 1)
+        val = -4.0;
     if (k == 2)
         val = 0.0;
     return val;
