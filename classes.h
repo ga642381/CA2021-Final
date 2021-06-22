@@ -98,7 +98,7 @@ public:
     Algorithms(int);
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
-    int MultiGridMethod(vector<double> &, const vector<double> &, const vector<double> &, string);
+    int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
 };
 
 #endif
