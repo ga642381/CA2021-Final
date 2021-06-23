@@ -24,17 +24,24 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
         numberOfGrids = 1;
         VW = 0;
         n = ((int)sqrt(dim) + 1) / 2 - 1;
-        VW = VW + numberOfGrids + n;
 
     }
     /*
     if (method == "V-Cycle")                          //不吃"else if"
-        return 0;
+    {
+        numberOfGrids = 2;
+        VW = 0;
+        n = ((int)sqrt(dim) + 1) / 4 - 1;
+    }
+
     if (method == "W-Cycle")
-        return 0;
-    else
-        return 0;
- */
+    {
+        numberOfGrids = 2;
+        VW = 1;
+        n = ((int)sqrt(dim) + 1) / 4 - 1;
+    }
+   */
+ 
     
     
     PoissonMatrix B(n);
@@ -45,7 +52,7 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
     double TOL = pow(10, -3) * (r | r);
     while (TOL <= (r | r)) 
     {
-        x = Cycle(A, x, b, numberOfGrids, VW, B, L, U);;
+        x = Cycle(A, x, b, numberOfGrids, VW, B, L, U);
         r = x - solved;
         steps++;
     }
