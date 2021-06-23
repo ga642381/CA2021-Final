@@ -76,6 +76,9 @@ public:
     vector<double> operator*(const vector<double>&);
 };
 
+
+
+
 /*================================Matrix end here===================================================================*/
 class Vectors
 {
@@ -132,6 +135,16 @@ public:
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
     int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
+    void modifiedIncompleteLU(Matrix&, WriteableMatrix&, WriteableMatrix&);
+
+
+
+
+    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int, Matrix&, WriteableMatrix&, WriteableMatrix&);
+    void CGdirect(Matrix&, vector<double>&, const vector<double>&);
+    void JacobiRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
+    void Interpolation(const vector<double>&, vector<double>&, int);
+    void Restriction(const vector<double>&, vector<double>&, int);
 };
 
 #endif
