@@ -27,7 +27,7 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
 
     }
     /*
-    if (method == "V-Cycle")                          //不吃"else if"
+    if (method == "V-Cycle")                          // not work for "else if" ?
     {
         numberOfGrids = 2;
         VW = 0;
