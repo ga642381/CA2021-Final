@@ -26,21 +26,22 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
         n = ((int)sqrt(dim) + 1) / 2 - 1;
 
     }
-    /*
+    
     if (method == "V-Cycle")                          // not work for "else if" ?
     {
-        numberOfGrids = 2;
+        numberOfGrids = 2;                            //layer number
         VW = 0;
         n = ((int)sqrt(dim) + 1) / 4 - 1;
     }
 
+    
     if (method == "W-Cycle")
     {
         numberOfGrids = 2;
         VW = 1;
         n = ((int)sqrt(dim) + 1) / 4 - 1;
     }
-   */
+   
  
     
     
