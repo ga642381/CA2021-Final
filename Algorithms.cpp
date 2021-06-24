@@ -174,11 +174,11 @@ void Algorithms::JacobiRelaxation(Matrix& A, vector<double>& x, const vector<dou
     }
 }
 
-void Algorithms::Restriction(const vector<double>& r, vector<double>& r2h, int n) {
-    for (int i = 1, l = 0, k = 0;i <= n;i++) {
-        for (int j = 1;j <= n;j++, k++) {
-            if (i % 2 == 0 && j % 2 == 0) {
-                r2h[l] = 1.0 / 16.0 * (4.0 * r[k] + 2.0 * (r[k - 1] + r[k + 1] + r[k - n] + r[k + n]) + r[k + n - 1] + r[k + n + 1] + r[k - n - 1] + r[k - n + 1]);
+void Algorithms::Restriction(const vector<double>& r,vector<double>& r2h,int n) {
+    for(int i=1,l=0,k=0;i<=n;i++) {
+        for(int j=1;j<=n;j++,k++) {
+            if(i%2==0 && j%2==0) {
+                r2h[l]=1.0/16.0*(4.0*r[k]+2.0*(r[k-1]+r[k+1]+r[k-n]+r[k+n])+r[k+n-1]+r[k+n+1]+r[k-n-1]+r[k-n+1]);
                 l++;
             }
         }

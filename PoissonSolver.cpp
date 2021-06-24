@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
     if (alg_num == 3)
     {
         method = "V-Cycle";
-        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);                //different about run & algs? 
+        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method); 
     }
     if (alg_num == 4)
     {
