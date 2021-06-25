@@ -5,7 +5,7 @@
 # -g : for debugging
 CC = g++ -Wall -g
 
-poissonSolver: Algorithms.o Vector.o PoissonMatrix.o LUMatrices.o  PoissonSolver.o
+poissonSolver: Algorithms.o Vector.o PoissonMatrix.o   PoissonSolver.o
 	$(CC) -o $@ $+
 
 Algorithms.o: Algorithms.cpp classes.h
@@ -16,10 +16,6 @@ Vector.o: Vector.cpp classes.h
 
 PoissonMatrix.o: PoissonMatrix.cpp classes.h
 	$(CC) -c -o $@ $<
-
-LUMatrices.o: LUMatrices.cpp classes.h
-	$(CC) -c -o $@ $<
-
 
 # ref : https://mropengate.blogspot.com/2018/01/makefile.html
 .PHONY: clean
