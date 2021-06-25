@@ -30,7 +30,9 @@ int main(int argc, char const *argv[])
     // Equation
     printf("\n3. Choose equation:\n\
     [1] -nabla u(x,y) = -4, and u(x,y) = x^2 + y^2.\n\
-    [2] -nabla u(x,y) = 0, and u(x,y) = 1.\n");
+    [2] -nabla u(x,y) = 0, and u(x,y) = 1.\n\
+    [3] -nabla u(x,y) = 2[(6x^2-6x+1)y^2(y-1)^2+(6y^2-6y+1)x^2(x-1)^2], and u(x,y) = x^2(x-1)^2y^2(y-1)^2.\n\
+    [4] -nabla u(x,y) = 2*x*(x-1) + 2*y*(y-1), and u(x,y) = x*(x-1)*y*(y-1).\n");
     printf("    equation : ");
     scanf("%d", &func);
     M = M - 1;

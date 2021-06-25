@@ -8,6 +8,10 @@ double Vectors::f(double x, double y, int k)
         val = -4.0;
     if (k == 2)
         val = 0.0;
+    if (k == 3)
+        val = 2*(6*pow(x,2)-6*x+1)*pow(y,2)*pow(y-1,2) + 2*(6*pow(y,2)-6*y+1)*pow(x,2)*pow(x-1,2);
+    if (k == 4)
+        val = 2*x*(x-1) + 2*y*(y-1);
     return val;
 }
 
@@ -18,6 +22,10 @@ double Vectors::g(double x, double y, int k)
         val = pow(x, 2) + pow(y, 2);
     if (k == 2)
         val = 1.0;
+    if (k == 3)
+        val = pow(x,2)*pow(x-1,2)*pow(y,2)*pow(y-1,2);
+    if (k == 4)
+        val = x*(x-1)*y*(y-1);
     return val;
 }
 
