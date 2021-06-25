@@ -136,7 +136,7 @@ public:
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
     int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
     void modifiedIncompleteLU(Matrix&, WriteableMatrix&, WriteableMatrix&);
-
+    void JacobiMethod(Matrix& ,vector<double>& ,const vector<double>& ,const vector<double>& );
 
 
 

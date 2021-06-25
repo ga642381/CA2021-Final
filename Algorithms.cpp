@@ -127,6 +127,32 @@ vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<doub
     }
 }
 
+void Algorithms::JacobiMethod(Matrix& A,vector<double>& x,const vector<double>& b,const vector<double>& solved) {
+    vector<double> tmp;
+    double sum;
+    int n=sqrt(x.size()),dim=n*n,steps=0;
+    double h=1.0/(double)(n+1);
+    vector<double> r(x.size());
+    r=x-solved;
+    double TOL=(r|r)*pow(10,-3);
+    while(TOL<=(r|r)) {
+        cout << (r|r)/TOL << endl;
+        tmp=x;
+        for(int i=0;i<n*n;i++) {
+            sum=0.0;
+            if(i>=n && i<dim-n) sum+=tmp[i-n]+tmp[i+n];
+            if(i<n) sum+=tmp[i+n];
+            if(i>=dim-n) sum+=tmp[i-n];
+            if(i%n!=0) sum+=tmp[i-1];
+            if(i%n!=n-1) sum+=tmp[i+1];
+            x[i]=1.0/(4.0*pow(1.0/h,2))*(b[i]+pow(1.0/h,2)*sum);
+            r[i]=x[i]-solved[i];
+        }
+        steps++;
+    }
+    //return steps;
+}
+
 void Algorithms::CGdirect(Matrix& A, vector<double>& x, const vector<double>& b) {
     double alpha, beta = 0.0, num1, num2, denom;
     int dim = x.size();
