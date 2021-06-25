@@ -143,6 +143,7 @@ public:
     vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int, Matrix&, WriteableMatrix&, WriteableMatrix&);
     void CGdirect(Matrix&, vector<double>&, const vector<double>&);
     void JacobiRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
+    void GaussSeidelRelaxtion(Matrix&, vector<double>&, const vector<double>&, int);
     void Interpolation(const vector<double>&, vector<double>&, int);
     void Restriction(const vector<double>&, vector<double>&, int);
 };
