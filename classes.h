@@ -101,7 +101,7 @@ public:
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
     int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
     void JacobiMethod(Matrix& ,vector<double>& ,const vector<double>& ,const vector<double>& );
-    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int);
+    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int, const vector<double>&);
     void JacobiRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
     void GaussSeidelRelaxtion(Matrix&, vector<double>&, const vector<double>&, int);
     void Interpolation(const vector<double>&, vector<double>&, int);

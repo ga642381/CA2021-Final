@@ -41,17 +41,19 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
     double TOL = pow(10, -3) * (r | r);
     while (TOL <= (r | r)) 
     {
-        x = Cycle(A, x, b, numberOfGrids, VW);
+        x = Cycle(A, x, b, numberOfGrids, VW, solved);
         r = x - solved;
         steps++;
     }
     return steps;
 }
 
-vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<double>& b, int lambda, int theta) {
+vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<double>& b, int lambda, int theta, const vector<double>& solved) {
     int dim = x.size(), n = sqrt(dim), N2h = (n + 1) / 2 - 1, dim2h = pow(N2h, 2);
-    vector<double> r(dim, 0), E(dim, 0), r2h(dim2h, 0), E2h(dim2h, 0);
+    vector<double> r(dim, 0), E(dim, 0), sol(dim, 0), r2h(dim2h, 0), E2h(dim2h, 0), sol2h(dim2h, 0);
     if (this->Vcounter == lambda) {
+        //JacobiMethod(A, x, b, solved);
+        //SORMethod(A, x, b, solved);
         JacobiRelaxation(A, x, b, 200);
         return x;
     }
@@ -59,9 +61,11 @@ vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<doub
         this->Vcounter++;
         JacobiRelaxation(A, x, b, 3);
         r = b - A * x;
+        sol = solved;
         Restriction(r, r2h, n);
-        E2h = Cycle(A, E2h, r2h, lambda, theta);
-        if (theta == 1) E2h = Cycle(A, E2h, r2h, lambda, theta);
+        Restriction(sol, sol2h, n);
+        E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h);
+        if (theta == 1) E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h);
         Interpolation(E2h, E, n);
         x += E;
         JacobiRelaxation(A, x, b, 3);
