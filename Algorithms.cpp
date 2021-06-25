@@ -18,20 +18,17 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
     int steps = 0, dim = x.size();
     vector<double> r(dim);
     r = x - solved;
-    int numberOfGrids = 2, VW = 0, n = 0;
+    int numberOfGrids = 2, VW = 0;
     if (method == "Two-Grid")
     {
         numberOfGrids = 1;
         VW = 0;
-        n = ((int)sqrt(dim) + 1) / 2 - 1;
-
     }
     
-    if (method == "V-Cycle")                          // not work for "else if" ?
+    if (method == "V-Cycle")
     {
-        numberOfGrids = 2;                            //layer number
+        numberOfGrids = 2; 
         VW = 0;
-        n = ((int)sqrt(dim) + 1) / 4 - 1;
     }
 
     
@@ -39,74 +36,22 @@ int Algorithms::MultiGridMethod(Matrix& A,vector<double> &x, const vector<double
     {
         numberOfGrids = 2;
         VW = 1;
-        n = ((int)sqrt(dim) + 1) / 4 - 1;
     }
-   
- 
     
-    
-    PoissonMatrix B(n);
-    LowerMatrix L(n);
-    UpperMatrix U(n);
-    B.InitHashMatrix();
-    modifiedIncompleteLU(B, L, U);   
     double TOL = pow(10, -3) * (r | r);
     while (TOL <= (r | r)) 
     {
-        x = Cycle(A, x, b, numberOfGrids, VW, B, L, U);
+        x = Cycle(A, x, b, numberOfGrids, VW);
         r = x - solved;
         steps++;
     }
-
     return steps;
 }
 
-
-void Algorithms::modifiedIncompleteLU(Matrix& A, WriteableMatrix& L, WriteableMatrix& U) {             //put A --> up&low Matrix
-    int i, j, k, m, u, dim = A.Size();
-    double sum, drop;
-
-    for (i = 0;i < dim;i++) {
-        drop = 0;
-        for (k = 0;k < 5;k++) {
-            m = A.HashMatrix[i][k];
-            if (m != -1 && m < i) {
-                sum = 0;
-                for (j = 0;j < 5;j++) {
-                    u = A.HashMatrix[i][j];
-                    if (u != -1 && u < k) {
-                        sum += L.Get(i, u) * U.Get(u, m);
-                    }
-                }
-                L.Set(i, m, (A.Get(i, m) - sum) / U.Get(m, m));
-                drop += sum;
-            }
-            else if (m != -1 && m >= i) {
-                m = A.HashMatrix[i][k];
-                if (m != -1 && m >= i) {
-                    sum = 0;
-                    for (j = 0;j < 5;j++) {
-                        u = A.HashMatrix[i][j];
-                        if (u != -1 && u < i) {
-                            sum += L.Get(i, u) * U.Get(u, m);
-                        }
-                    }
-                    U.Set(i, m, (A.Get(i, m) - sum));
-                    drop += sum;
-                }
-            }
-        }
-        U.Set(i, i, (U.Get(i, i) - drop));
-    }
-}
-
-
-vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<double>& b, int lambda, int theta, Matrix& B, WriteableMatrix& L, WriteableMatrix& U) {
+vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<double>& b, int lambda, int theta) {
     int dim = x.size(), n = sqrt(dim), N2h = (n + 1) / 2 - 1, dim2h = pow(N2h, 2);
     vector<double> r(dim, 0), E(dim, 0), r2h(dim2h, 0), E2h(dim2h, 0);
     if (this->Vcounter == lambda) {
-        //PCGdirect(B, L, U, x, b);
-        //CGdirect(A,x,b);
         JacobiRelaxation(A, x, b, 200);
         return x;
     }
@@ -116,8 +61,8 @@ vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<doub
         GaussSeidelRelaxtion(A, x, b, 3);
         r = b - A * x;
         Restriction(r, r2h, n);
-        E2h = Cycle(A, E2h, r2h, lambda, theta, B, L, U);
-        if (theta == 1) E2h = Cycle(A, E2h, r2h, lambda, theta, B, L, U);
+        E2h = Cycle(A, E2h, r2h, lambda, theta);
+        if (theta == 1) E2h = Cycle(A, E2h, r2h, lambda, theta);
         Interpolation(E2h, E, n);
         x += E;
         //JacobiRelaxation(A, x, b, 3);
@@ -152,39 +97,6 @@ void Algorithms::JacobiMethod(Matrix& A,vector<double>& x,const vector<double>& 
     }
     //return steps;
 }
-
-void Algorithms::CGdirect(Matrix& A, vector<double>& x, const vector<double>& b) {
-    double alpha, beta = 0.0, num1, num2, denom;
-    int dim = x.size();
-
-    vector<double> r(dim), Ap(dim);
-    r = b - A * x;
-    vector<double> p(r), rTmp(r);
-
-    num2 = rTmp * rTmp;
-    num1 = num2;
-    double TOL = pow(10, -3) * (r | r);
-    while (TOL < (r | r)) {
-        Ap = A * p;
-        denom = p * Ap;
-        alpha = num2 / denom;
-
-        for (int i = 0;i < dim;i++) {
-            x[i] += alpha * p[i];
-            r[i] -= alpha * Ap[i];
-        }
-
-        num2 = r * r;
-        beta = num2 / num1;
-
-        for (int i = 0;i < dim;i++) {
-            p[i] = r[i] + beta * p[i];
-        }
-        rTmp = r;
-        num1 = num2;
-    }
-}
-
 
 void Algorithms::GaussSeidelRelaxtion(Matrix& A, vector<double>& x, const vector<double>& b, int steps) {
     vector<double> tmp;

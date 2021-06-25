@@ -24,7 +24,6 @@ class Matrix {
 public:
     vector<vector<int> > HashMatrix;
     virtual int Size() = 0;
-    virtual double Get(int, int) = 0;
     virtual vector<double> operator*(const vector<double>&) = 0;
 };
 
@@ -37,46 +36,12 @@ class PoissonMatrix : public Matrix {
 private:
     int dim;
     int n;
-    double diagonal;
-    double tridiagonal;
-    double identity;
 public:
     PoissonMatrix(int);
     ~PoissonMatrix();
     int Size();
-    double Get(int, int);
-    void InitHashMatrix();
     vector<double> operator*(const vector<double>&);
 };
-class LowerMatrix : public WriteableMatrix {
-private:
-    int dim;
-    int n;
-public:
-    LowerMatrix(int);
-    ~LowerMatrix();
-    vector<double> diagonal;
-    vector<double> tridiagonal;
-    vector<double> identity;
-    int Size();
-    double Get(int, int);
-    void Set(int, int, double);
-    vector<double> operator*(const vector<double>&);
-};
-
-class UpperMatrix : public LowerMatrix {
-private:
-    int dim;
-    int n;
-public:
-    UpperMatrix(int);
-    ~UpperMatrix();
-    double Get(int, int);
-    void Set(int, int, double);
-    vector<double> operator*(const vector<double>&);
-};
-
-
 
 
 /*================================Matrix end here===================================================================*/
@@ -135,13 +100,8 @@ public:
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
     int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
-    void modifiedIncompleteLU(Matrix&, WriteableMatrix&, WriteableMatrix&);
     void JacobiMethod(Matrix& ,vector<double>& ,const vector<double>& ,const vector<double>& );
-
-
-
-    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int, Matrix&, WriteableMatrix&, WriteableMatrix&);
-    void CGdirect(Matrix&, vector<double>&, const vector<double>&);
+    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int);
     void JacobiRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
     void GaussSeidelRelaxtion(Matrix&, vector<double>&, const vector<double>&, int);
     void Interpolation(const vector<double>&, vector<double>&, int);
