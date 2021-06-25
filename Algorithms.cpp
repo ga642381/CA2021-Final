@@ -53,7 +53,7 @@ vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<doub
     vector<double> r(dim, 0), E(dim, 0), sol(dim, 0), r2h(dim2h, 0), E2h(dim2h, 0), sol2h(dim2h, 0);
     if (this->Vcounter == lambda) {
         //JacobiMethod(A, x, b, solved);
-        //SORMethod(A, x, b, solved);
+        //SORMethod(x, b, solved);
         JacobiRelaxation(A, x, b, 200);
         return x;
     }
