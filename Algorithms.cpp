@@ -1,5 +1,11 @@
 ﻿#include "classes.h"
 
+double cal_error(vector<double> &x, const vector<double> &y)
+{
+    vector<double> r = x - y;
+    return pow((r | r), 2) / double(r.size());
+}
+
 Algorithms::Algorithms(int n)
 {
     this->n = n;
@@ -11,7 +17,82 @@ Algorithms::Algorithms(int n)
 
 Algorithms::~Algorithms() {}
 
-int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<double> &b, const vector<double> &solved, string method)
+int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved, const int fixed_step)
+{
+
+    double sum;
+    double Pi = 3.141592654;
+    double omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
+
+    int n = sqrt(x.size());
+    int steps = 0;
+    double h = 1.0 / (double)(n + 1);
+
+    // residual
+    vector<double> r(x.size());
+    r = x - solved;
+
+    // iterate until converge
+    if (fixed_step < 0)
+    {
+        double TOL = (r | r) * pow(10, -3);
+        while (TOL <= (r | r))
+        {
+            // iterate each cell
+            for (int i = 0; i < n * n; i++)
+            {
+                sum = 0.0;
+                if (i >= n && i < dim - n)
+                    sum += x[i - n] + x[i + n];
+                if (i < n)
+                    sum += x[i + n];
+                if (i >= dim - n)
+                    sum += x[i - n];
+                if (i % n != 0)
+                    sum += x[i - 1];
+                if (i % n != n - 1)
+                    sum += x[i + 1];
+                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                r[i] = x[i] - solved[i];
+            }
+            steps++;
+            this->update_step++;
+        }
+    }
+
+    // update loop
+    else
+    {
+        while (this->update_step < fixed_step)
+        {
+            // iterate each cell
+            for (int i = 0; i < n * n; i++)
+            {
+                sum = 0.0;
+                if (i >= n && i < dim - n)
+                    sum += x[i - n] + x[i + n];
+                if (i < n)
+                    sum += x[i + n];
+                if (i >= dim - n)
+                    sum += x[i - n];
+                if (i % n != 0)
+                    sum += x[i - 1];
+                if (i % n != n - 1)
+                    sum += x[i + 1];
+                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                r[i] = x[i] - solved[i];
+            }
+            steps++;
+            this->update_step++;
+        }
+    }
+    cout << "==========\n";
+    double error = cal_error(x, solved);
+    cout << "Error : " << error << endl;
+    return steps;
+}
+
+int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<double> &b, const vector<double> &solved, string method, const int fixed_step)
 {
     // MultiGrid Method
     // To be implemented
@@ -40,13 +121,31 @@ int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<doubl
         VW = 1;
     }
 
-    double TOL = pow(10, -3) * (r | r);
-    while (TOL <= (r | r))
+    // iterate until converge
+    if (fixed_step < 0)
     {
-        x = Cycle(A, x, b, numberOfGrids, VW, solved);
-        r = x - solved;
-        steps++;
+        double TOL = pow(10, -3) * (r | r);
+        while (TOL <= (r | r))
+        {
+            x = Cycle(A, x, b, numberOfGrids, VW, solved);
+            r = x - solved;
+            steps++;
+        }
     }
+
+    // run fixed step (might be more, we run until the whole cycle is finished)
+    else
+    {
+        while (this->update_step < fixed_step)
+        {
+            x = Cycle(A, x, b, numberOfGrids, VW, solved);
+            r = x - solved;
+            steps++;
+        }
+    }
+    cout << "==========\n";
+    double error = cal_error(x, solved);
+    cout << "error : " << error << endl;
     return steps;
 }
 
@@ -75,7 +174,6 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
     else
     {
         this->Vcounter++;
-
         JacobiRelaxation(A, x, b, smoothing_step);
         r = b - A * x;
         sol = solved;
@@ -297,46 +395,4 @@ void Algorithms::Interpolation(const vector<double> &E2h, vector<double> &E, int
             }
         }
     }
-}
-
-int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved)
-{
-
-    double sum;
-    double Pi = 3.141592654;
-    double omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
-
-    int n = sqrt(x.size());
-    int steps = 0;
-    double h = 1.0 / (double)(n + 1);
-
-    // residual
-    vector<double> r(x.size());
-    r = x - solved;
-    double TOL = (r | r) * pow(10, -3);
-
-    // update loop
-    while (TOL <= (r | r))
-    {
-        // iterate each cell
-        for (int i = 0; i < n * n; i++)
-        {
-            sum = 0.0;
-            if (i >= n && i < dim - n)
-                sum += x[i - n] + x[i + n];
-            if (i < n)
-                sum += x[i + n];
-            if (i >= dim - n)
-                sum += x[i - n];
-            if (i % n != 0)
-                sum += x[i - 1];
-            if (i % n != n - 1)
-                sum += x[i + 1];
-            x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
-            r[i] = x[i] - solved[i];
-        }
-        steps++;
-        this->update_step++;
-    }
-    return steps;
 }

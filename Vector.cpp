@@ -137,6 +137,14 @@ int Startvector::Size()
 {
     return x.size();
 }
+/* === Vector Utils ===*/
+void print_vector(const vector<double> &v)
+{
+    for (int i = 0; i < (int)(v.size()); i++)
+    {
+        cout << v[i] << " ,";
+    }
+}
 
 /* === Vector Operators ===*/
 vector<double> operator-(const vector<double> &lhs, const vector<double> &rhs)

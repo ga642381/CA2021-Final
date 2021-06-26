@@ -4,39 +4,36 @@
 
 using namespace std;
 
-
 int main(int argc, char const *argv[])
 {
     //=============openmp test==============================================
     printf("==========This is openmp test part====================\n");
     int id;
-    id = omp_get_thread_num();  
+    id = omp_get_thread_num();
     printf("chcek working thread id = %d\n", id);
-    
-#  pragma omp parallel
+
+#pragma omp parallel
     {
         printf("Environment variable OMP_NUM_THREADS\n");
     }
 
     omp_set_num_threads(3);
-#  pragma omp parallel
+#pragma omp parallel
     {
         printf("Runtime library routine omp_set_num_threads()\n");
     }
 
-#  pragma omp parallel num_threads( 4 )
+#pragma omp parallel num_threads(4)
     {
         printf("Clause num_threads()\n");
     }
-    
+
     printf("==========openmp test end=============================\n");
 
     //==============================================================================================================
 
-
-
     string method;
-    int M, alg_num, func, steps = 0;
+    int M, alg_num, func, steps, fixed_steps = 0;
 
     /* === Input Parameters === */
     // algorithms
@@ -65,6 +62,13 @@ int main(int argc, char const *argv[])
     [5] -nabla u(x,y) = 0 and u(x,y) = exp(-2pi * x) * sin(2pi * y)\n");
     printf("    equation : ");
     scanf("%d", &func);
+
+    // If fixed steps
+    printf("\n4. Update fixed steps (if run until converge to analytical sol, please enter -1)\n");
+    printf("    fixed steps : ");
+    scanf("%d", &fixed_steps);
+    printf("\n");
+
     M = M - 1;
 
     /* === Initialize === */
@@ -80,23 +84,23 @@ int main(int argc, char const *argv[])
     if (alg_num == 1)
     {
         method = "SOR";
-        steps = Algs.SORMethod(X.x, B.b, B.solved);
+        steps = Algs.SORMethod(X.x, B.b, B.solved, fixed_steps);
     }
 
     if (alg_num == 2)
     {
         method = "Two-Grid";
-        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method, fixed_steps);
     }
     if (alg_num == 3)
     {
         method = "V-Cycle";
-        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method, fixed_steps);
     }
     if (alg_num == 4)
     {
         method = "W-Cycle";
-        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method, fixed_steps);
     }
 
     /* === Information ===*/

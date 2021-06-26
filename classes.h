@@ -11,7 +11,7 @@
 #include <time.h>
 #include <string>
 #include <math.h>
-# include <omp.h>
+#include <omp.h>
 
 using namespace std;
 
@@ -20,8 +20,8 @@ void operator+=(vector<double> &, const vector<double> &);
 vector<double> operator*(double, vector<double>);
 double operator|(const vector<double> &, const vector<double> &);
 double operator*(const vector<double> &, const vector<double> &);
+void print_vector(const vector<double> &);
 
-/*TODO Matrix WriteableMatrix PoissonMatrix UpperMatrix LowerMatrix*/
 class Matrix
 {
 public:
@@ -105,8 +105,8 @@ public:
 
     Algorithms(int);
     ~Algorithms();
-    int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
-    int MultiGridMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &, string);
+    int SORMethod(vector<double> &, const vector<double> &, const vector<double> &, int fixed_step);
+    int MultiGridMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &, string, int fixed_step);
     void JacobiMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &);
     vector<double> Cycle(Matrix &, vector<double> &, const vector<double> &, int, int, const vector<double> &);
     void JacobiRelaxation(Matrix &, vector<double> &, const vector<double> &, int);
