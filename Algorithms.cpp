@@ -54,7 +54,8 @@ vector<double> Algorithms::Cycle(Matrix& A, vector<double>& x, const vector<doub
     if (this->Vcounter == lambda) {
         //JacobiMethod(A, x, b, solved);
         //SORMethod(x, b, solved);
-        JacobiRelaxation(A, x, b, 200);
+        //JacobiRelaxation(A, x, b, 200);
+        SORRelaxation(A, x, b, 10);
         return x;
     }
     else {
@@ -115,6 +116,23 @@ void Algorithms::JacobiRelaxation(Matrix& A, vector<double>& x, const vector<dou
             if (i % n != n - 1) sum += tmp[i + 1];
             x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + tmp[i] * (1 - omega);
             tmp[i] = x[i];
+        }
+    }
+}
+
+void Algorithms::SORRelaxation(Matrix& A, vector<double>& x, const vector<double>& b, int steps) {
+    vector<double> tmp;
+    double sum, Pi=3.141592654, omega = 2/(1+sqrt(1-pow(cos(Pi*h),2)));
+    int n = sqrt(x.size()), dim = n * n;
+    for (int k = 0;k < steps;k++) {
+        for (int i = 0;i < n * n;i++) {
+            sum = 0.0;
+            if(i>=n && i<dim-n) sum+=x[i-n]+x[i+n];
+            if(i<n) sum+=x[i+n];
+            if(i>=dim-n) sum+=x[i-n];
+            if(i%n!=0) sum+=x[i-1];
+            if(i%n!=n-1) sum+=x[i+1];
+            x[i]=omega*1.0/(4.0*pow(1.0/h,2))*(b[i]+pow(1.0/h,2)*sum)+x[i]*(1-omega);
         }
     }
 }
