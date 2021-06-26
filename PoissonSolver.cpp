@@ -32,7 +32,8 @@ int main(int argc, char const *argv[])
     [1] -nabla u(x,y) = -4, and u(x,y) = x^2 + y^2.\n\
     [2] -nabla u(x,y) = 0, and u(x,y) = 1.\n\
     [3] -nabla u(x,y) = 2[(6x^2-6x+1)y^2(y-1)^2+(6y^2-6y+1)x^2(x-1)^2], and u(x,y) = x^2(x-1)^2y^2(y-1)^2.\n\
-    [4] -nabla u(x,y) = 2*x*(x-1) + 2*y*(y-1), and u(x,y) = x*(x-1)*y*(y-1).\n");
+    [4] -nabla u(x,y) = 2*x*(x-1) + 2*y*(y-1), and u(x,y) = x*(x-1)*y*(y-1).\n\
+    [5] -nabla u(x,y) = 0 and u(x,y) = exp(-2pi * x) * sin(2pi * y)\n");
     printf("    equation : ");
     scanf("%d", &func);
     M = M - 1;
@@ -56,17 +57,17 @@ int main(int argc, char const *argv[])
     if (alg_num == 2)
     {
         method = "Two-Grid";
-        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
     }
     if (alg_num == 3)
     {
         method = "V-Cycle";
-        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method); 
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
     }
     if (alg_num == 4)
     {
         method = "W-Cycle";
-        steps = Algs.MultiGridMethod(A,X.x, B.b, B.solved, method);
+        steps = Algs.MultiGridMethod(A, X.x, B.b, B.solved, method);
     }
 
     /* === Information ===*/
@@ -75,10 +76,11 @@ int main(int argc, char const *argv[])
     cout << "==========\n";
     cout << "Method : " << method << endl;
     cout << "Steps : " << steps << endl;
+    cout << "Update Steps : " << Algs.update_step << endl;
     cout << "Time : " << timer << " (s)" << endl;
 
     /* === For Plotting ===*/
-    X.WriteToFile();
+    //X.WriteToFile();
 
     return EXIT_SUCCESS;
 }

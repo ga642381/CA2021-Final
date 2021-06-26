@@ -1,17 +1,23 @@
 #include "classes.h"
 
+#ifndef PI
+#define PI 3.14159265
+#endif
+
 double Vectors::f(double x, double y, int k)
 {
-	
+
     double val;
     if (k == 1)
         val = -4.0;
     if (k == 2)
         val = 0.0;
     if (k == 3)
-        val = 2*(6*pow(x,2)-6*x+1)*pow(y,2)*pow(y-1,2) + 2*(6*pow(y,2)-6*y+1)*pow(x,2)*pow(x-1,2);
+        val = 2 * (6 * pow(x, 2) - 6 * x + 1) * pow(y, 2) * pow(y - 1, 2) + 2 * (6 * pow(y, 2) - 6 * y + 1) * pow(x, 2) * pow(x - 1, 2);
     if (k == 4)
-        val = 2*x*(x-1) + 2*y*(y-1);
+        val = 2 * x * (x - 1) + 2 * y * (y - 1);
+    if (k == 5)
+        val = 0.0;
     return val;
 }
 
@@ -23,9 +29,12 @@ double Vectors::g(double x, double y, int k)
     if (k == 2)
         val = 1.0;
     if (k == 3)
-        val = pow(x,2)*pow(x-1,2)*pow(y,2)*pow(y-1,2);
+        val = pow(x, 2) * pow(x - 1, 2) * pow(y, 2) * pow(y - 1, 2);
     if (k == 4)
-        val = x*(x-1)*y*(y-1);
+        val = x * (x - 1) * y * (y - 1);
+    if (k == 5)
+        val = exp(-2 * PI * x) * sin(-2 * PI * y);
+
     return val;
 }
 

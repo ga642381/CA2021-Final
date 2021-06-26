@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <time.h>
 #include <string>
+#include <math.h>
 
 using namespace std;
 
@@ -20,29 +21,32 @@ double operator|(const vector<double> &, const vector<double> &);
 double operator*(const vector<double> &, const vector<double> &);
 
 /*TODO Matrix WriteableMatrix PoissonMatrix UpperMatrix LowerMatrix*/
-class Matrix {
+class Matrix
+{
 public:
-    vector<vector<int> > HashMatrix;
+    vector<vector<int>> HashMatrix;
     virtual int Size() = 0;
-    virtual vector<double> operator*(const vector<double>&) = 0;
+    virtual vector<double> operator*(const vector<double> &) = 0;
 };
 
-class WriteableMatrix : public Matrix {
+class WriteableMatrix : public Matrix
+{
 public:
     virtual void Set(int, int, double) = 0;
 };
 
-class PoissonMatrix : public Matrix {
+class PoissonMatrix : public Matrix
+{
 private:
     int dim;
     int n;
+
 public:
     PoissonMatrix(int);
     ~PoissonMatrix();
     int Size();
-    vector<double> operator*(const vector<double>&);
+    vector<double> operator*(const vector<double> &);
 };
-
 
 /*================================Matrix end here===================================================================*/
 class Vectors
@@ -96,16 +100,18 @@ private:
     int Vcounter;
 
 public:
+    int update_step;
+
     Algorithms(int);
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &);
-    int MultiGridMethod(Matrix&,vector<double> &, const vector<double> &, const vector<double> &, string);
-    void JacobiMethod(Matrix& ,vector<double>& ,const vector<double>& ,const vector<double>& );
-    vector<double> Cycle(Matrix&, vector<double>&, const vector<double>&, int, int, const vector<double>&);
-    void JacobiRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
-    void SORRelaxation(Matrix&, vector<double>&, const vector<double>&, int);
-    void Interpolation(const vector<double>&, vector<double>&, int);
-    void Restriction(const vector<double>&, vector<double>&, int);
+    int MultiGridMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &, string);
+    void JacobiMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &);
+    vector<double> Cycle(Matrix &, vector<double> &, const vector<double> &, int, int, const vector<double> &);
+    void JacobiRelaxation(Matrix &, vector<double> &, const vector<double> &, int);
+    void SORRelaxation(Matrix &, vector<double> &, const vector<double> &, int);
+    void Interpolation(const vector<double> &, vector<double> &, int);
+    void Restriction(const vector<double> &, vector<double> &, int);
 };
 
 #endif
