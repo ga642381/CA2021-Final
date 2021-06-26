@@ -4,8 +4,37 @@
 
 using namespace std;
 
+
 int main(int argc, char const *argv[])
 {
+    //=============openmp test==============================================
+    printf("==========This is openmp test part====================\n");
+    int id;
+    id = omp_get_thread_num();  
+    printf("chcek working thread id = %d\n", id);
+    
+#  pragma omp parallel
+    {
+        printf("Environment variable OMP_NUM_THREADS\n");
+    }
+
+    omp_set_num_threads(3);
+#  pragma omp parallel
+    {
+        printf("Runtime library routine omp_set_num_threads()\n");
+    }
+
+#  pragma omp parallel num_threads( 4 )
+    {
+        printf("Clause num_threads()\n");
+    }
+    
+    printf("==========openmp test end=============================\n");
+
+    //==============================================================================================================
+
+
+
     string method;
     int M, alg_num, func, steps = 0;
 

@@ -11,6 +11,7 @@
 #include <time.h>
 #include <string>
 #include <math.h>
+# include <omp.h>
 
 using namespace std;
 
