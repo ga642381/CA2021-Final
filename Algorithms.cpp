@@ -250,8 +250,8 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
         Restriction(sol, sol2h, n);
         E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h);
 
-        // if (theta == 1)
-        //     E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h); // for W-Cycle
+        if (theta == 1)
+            E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h); // for W-Cycle
         Interpolation(E2h, E, n);
         x += E;
         JacobiRelaxation(A, x, b, smoothing_step);
