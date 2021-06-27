@@ -19,11 +19,11 @@ Algorithms::~Algorithms() {}
 
 int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved, const int fixed_step)
 {
-
     double sum;
     double Pi = 3.141592654;
     double omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
-
+    vector<double> tmp=x;
+    vector<double> sum_rec = x;
     int n = sqrt(x.size());
     int steps = 0;
     double h = 1.0 / (double)(n + 1);
@@ -38,23 +38,86 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
         double TOL = (r | r) * pow(10, -3);
         while (TOL <= (r | r))
         {
+            printf("error=%f\n", (r | r));
             // iterate each cell
-            for (int i = 0; i < n * n; i++)
-            {
-                sum = 0.0;
-                if (i >= n && i < dim - n)
-                    sum += x[i - n] + x[i + n];
-                if (i < n)
-                    sum += x[i + n];
-                if (i >= dim - n)
-                    sum += x[i - n];
-                if (i % n != 0)
-                    sum += x[i - 1];
-                if (i % n != n - 1)
-                    sum += x[i + 1];
-                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
-                r[i] = x[i] - solved[i];
+
+
+                /*
+#pragma omp for
+                for (int i = 0;i < n * n;i++)
+                {
+                    
+                    
+                }
+
+#pragma omp for
+                for (int i = 0;i < n * n;i++)
+                {
+                    if (i % 2 == 1)
+                        tmp[i] = x[i] * (1 - omega);
+                }
+
             }
+            */
+#pragma omp parallel num_threads(2)
+            {
+#pragma omp for
+                for (int i = 0; i < n * n; i++)
+                {
+
+                    if ((i / n + i % n) % 2 == 0)
+                    {
+                        //printf("%d",)
+                        sum = 0.0;
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+
+                        //tmp[i] = x[i] * (1 - omega);
+                        //x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum)+ x[i] * (1 - omega);
+                        tmp[i] = x[i] * (1 - omega);
+                        x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
+                        r[i] = x[i] - solved[i];
+                    }
+                }
+
+                //#pragma omp for
+                for (int i = 0; i < n * n; i++)
+                {
+                    if ((i / n + i % n) % 2 == 1)
+                    {
+                        sum = 0.0;
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+
+                        //tmp[i] = x[i] * (1 - omega);
+                        //x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum)+ x[i] * (1 - omega);;
+                        tmp[i] = x[i] * (1 - omega);
+                        x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
+                        r[i] = x[i] - solved[i];
+                    }
+                }
+            }
+            //x = tmp + sum_rec;
+            //x = sum_rec;
+            //x += tmp;
+
+            //r = x - solved;
             steps++;
             this->update_step++;
         }
