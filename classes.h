@@ -5,7 +5,8 @@
 #include <cstdlib>
 #include <cmath>
 #include <fstream>
-#include <cstdio>
+// #include <cstdio>
+#include <stdio.h>
 #include <vector>
 #include <assert.h>
 #include <time.h>
@@ -96,6 +97,7 @@ class Algorithms
 {
 private:
     int n;
+    int num_threads;
     int dim;
     double h;
     int Vcounter;
@@ -103,7 +105,7 @@ private:
 public:
     int update_step;
 
-    Algorithms(int);
+    Algorithms(int, int);
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &, int fixed_step);
     int MultiGridMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &, string, int fixed_step);

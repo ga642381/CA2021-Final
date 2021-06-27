@@ -1,14 +1,17 @@
 ﻿#include "classes.h"
 
+using namespace std;
+
 double cal_error(vector<double> &x, const vector<double> &y)
 {
     vector<double> r = x - y;
     return pow((r | r), 2) / double(r.size());
 }
 
-Algorithms::Algorithms(int n)
+Algorithms::Algorithms(int n, int num_threads)
 {
     this->n = n;
+    this->num_threads = num_threads;
     this->dim = n * n;
     this->h = 1.0 / (double)(n + 1);
     this->Vcounter = 0;
@@ -19,56 +22,32 @@ Algorithms::~Algorithms() {}
 
 int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vector<double> &solved, const int fixed_step)
 {
-    double sum;
-    double Pi = 3.141592654;
-    double omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
-    vector<double> tmp=x;
+    //double Pi = 3.141592654;
+    //double omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
+    double omega = 1.5;
+    vector<double> tmp = x;
     vector<double> sum_rec = x;
     int n = sqrt(x.size());
     int steps = 0;
     double h = 1.0 / (double)(n + 1);
-
     // residual
     vector<double> r(x.size());
     r = x - solved;
 
-    // iterate until converge
+    //  === iterate until converge === //
     if (fixed_step < 0)
     {
         double TOL = (r | r) * pow(10, -3);
         while (TOL <= (r | r))
         {
-            printf("error=%f\n", (r | r));
-            // iterate each cell
-
-
-                /*
+#pragma omp parallel num_threads(this->num_threads)
+            { //parallel decalare
 #pragma omp for
-                for (int i = 0;i < n * n;i++)
+                for (int i = 0; i < n * n; i++) // even cell
                 {
-                    
-                    
-                }
-
-#pragma omp for
-                for (int i = 0;i < n * n;i++)
-                {
-                    if (i % 2 == 1)
-                        tmp[i] = x[i] * (1 - omega);
-                }
-
-            }
-            */
-#pragma omp parallel num_threads(2)
-            {
-#pragma omp for
-                for (int i = 0; i < n * n; i++)
-                {
-
+                    double sum = 0.0;
                     if ((i / n + i % n) % 2 == 0)
                     {
-                        //printf("%d",)
-                        sum = 0.0;
                         if (i >= n && i < dim - n)
                             sum += x[i - n] + x[i + n];
                         if (i < n)
@@ -80,20 +59,19 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
                         if (i % n != n - 1)
                             sum += x[i + 1];
 
-                        //tmp[i] = x[i] * (1 - omega);
-                        //x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum)+ x[i] * (1 - omega);
                         tmp[i] = x[i] * (1 - omega);
                         x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
                         r[i] = x[i] - solved[i];
                     }
-                }
+                } // end even cell
 
-                //#pragma omp for
-                for (int i = 0; i < n * n; i++)
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // odd cell
                 {
+                    double sum = 0.0;
                     if ((i / n + i % n) % 2 == 1)
                     {
-                        sum = 0.0;
+
                         if (i >= n && i < dim - n)
                             sum += x[i - n] + x[i + n];
                         if (i < n)
@@ -105,54 +83,81 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
                         if (i % n != n - 1)
                             sum += x[i + 1];
 
-                        //tmp[i] = x[i] * (1 - omega);
-                        //x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum)+ x[i] * (1 - omega);;
                         tmp[i] = x[i] * (1 - omega);
                         x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
                         r[i] = x[i] - solved[i];
                     }
-                }
+                } // end odd cell
             }
-            //x = tmp + sum_rec;
-            //x = sum_rec;
-            //x += tmp;
-
-            //r = x - solved;
             steps++;
             this->update_step++;
-        }
-    }
+        } // end while
+    }     // end if fixed_step <0
 
-    // update loop
+    // =================== Given Fixed Steps =========================//
     else
     {
         while (this->update_step < fixed_step)
         {
-            // iterate each cell
-            for (int i = 0; i < n * n; i++)
-            {
-                sum = 0.0;
-                if (i >= n && i < dim - n)
-                    sum += x[i - n] + x[i + n];
-                if (i < n)
-                    sum += x[i + n];
-                if (i >= dim - n)
-                    sum += x[i - n];
-                if (i % n != 0)
-                    sum += x[i - 1];
-                if (i % n != n - 1)
-                    sum += x[i + 1];
-                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
-                r[i] = x[i] - solved[i];
-            }
+#pragma omp parallel num_threads(this->num_threads)
+            { //parallel decalare
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // even cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 0)
+                    {
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+
+                        tmp[i] = x[i] * (1 - omega);
+                        x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
+                        r[i] = x[i] - solved[i];
+                    }
+                } // end even cell
+
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // odd cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 1)
+                    {
+
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+
+                        tmp[i] = x[i] * (1 - omega);
+                        x[i] = tmp[i] + omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum);
+                        r[i] = x[i] - solved[i];
+                    }
+                } // end odd cell
+            }     // end parallel
             steps++;
             this->update_step++;
-        }
+        } // end while
     }
+    //======== end SOR, print and return ========//
     cout << "==========\n";
     double error = cal_error(x, solved);
     cout << "Error : " << error << endl;
     return steps;
+    // end parallel decalre
 }
 
 int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<double> &b, const vector<double> &solved, string method, const int fixed_step)
@@ -236,6 +241,7 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
     }
     else
     {
+
         this->Vcounter++;
         JacobiRelaxation(A, x, b, smoothing_step);
         r = b - A * x;
@@ -320,69 +326,121 @@ void Algorithms::JacobiRelaxation(Matrix &A, vector<double> &x, const vector<dou
 void Algorithms::SORRelaxation(Matrix &A, vector<double> &x, const vector<double> &b, int steps)
 {
     vector<double> x_prev;
-    vector<double> r;
-    double sum, Pi = 3.141592654, omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
+    double Pi = 3.141592654, omega = 2 / (1 + sqrt(1 - pow(cos(Pi * h), 2)));
     int n = sqrt(x.size()), dim = n * n;
 
-    // Relax until converge
     if (steps < 0)
     {
         double residual = 999;
-        while (residual > 1e-15)
+        while (residual > 1e-8)
         {
             x_prev = x;
-            for (int i = 0; i < n * n; i++) // each cell
+#pragma omp parallel num_threads(this->num_threads)
             {
-                sum = 0.0;
-                if (i >= n && i < dim - n)
-                    sum += x[i - n] + x[i + n];
-                if (i < n)
-                    sum += x[i + n];
-                if (i >= dim - n)
-                    sum += x[i - n];
-                if (i % n != 0)
-                    sum += x[i - 1];
-                if (i % n != n - 1)
-                    sum += x[i + 1];
-                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
-            }
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // even cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 0)
+                    {
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+                        x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                    }
+                } // end even cell
 
-            // cal residual
-            r = x - x_prev;
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // odd cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 1)
+                    {
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+                        x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                    }
+                } // end odd cell
+            }     // end parallel
+
+            //====== Cal residual ===========//
+            vector<double> r = x - x_prev;
             double r_tmp = 0;
             for (int i = 0; i < (int)(r.size()); i++)
             {
                 r_tmp += abs(r[i]);
             }
             residual = r_tmp / (double)(r.size());
-
             this->update_step++;
-        }
-    }
+        } // end while
+    }     // end if step < 0
 
     // Relax given steps
     else
     {
+
         for (int k = 0; k < steps; k++) // step
         {
-            for (int i = 0; i < n * n; i++) // each cell
+#pragma omp parallel num_threads(this->num_threads)
             {
-                sum = 0.0;
-                if (i >= n && i < dim - n)
-                    sum += x[i - n] + x[i + n];
-                if (i < n)
-                    sum += x[i + n];
-                if (i >= dim - n)
-                    sum += x[i - n];
-                if (i % n != 0)
-                    sum += x[i - 1];
-                if (i % n != n - 1)
-                    sum += x[i + 1];
-                x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // even cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 0)
+                    {
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+                        x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                    }
+                } // end even cell
+
+#pragma omp for
+                for (int i = 0; i < n * n; i++) // odd cell
+                {
+                    double sum = 0.0;
+                    if ((i / n + i % n) % 2 == 1)
+                    {
+                        if (i >= n && i < dim - n)
+                            sum += x[i - n] + x[i + n];
+                        if (i < n)
+                            sum += x[i + n];
+                        if (i >= dim - n)
+                            sum += x[i - n];
+                        if (i % n != 0)
+                            sum += x[i - 1];
+                        if (i % n != n - 1)
+                            sum += x[i + 1];
+                        x[i] = omega * 1.0 / (4.0 * pow(1.0 / h, 2)) * (b[i] + pow(1.0 / h, 2) * sum) + x[i] * (1 - omega);
+                    }
+                } // end odd cell
+                this->update_step++;
             }
-            this->update_step++;
-        }
-    }
+        } // end for step
+    }     // end step >0
 }
 
 void Algorithms::Restriction(const vector<double> &r, vector<double> &r2h, int n)

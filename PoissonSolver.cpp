@@ -1,34 +1,22 @@
 #include "classes.h"
-#include <stdio.h>
-#include <string>
 
 using namespace std;
 
 int main(int argc, char const *argv[])
 {
-    //=============openmp test==============================================
-    printf("==========This is openmp test part====================\n");
-    int id;
-    id = omp_get_thread_num();
-    printf("chcek working thread id = %d\n", id);
+    int num_thread;
 
-#pragma omp parallel
+    printf("\n");
+    printf("0. Set number of thread for OpenMP\n");
+    printf("    Number of Thread : ");
+    scanf("%d", &num_thread);
+
+    printf("\n");
+#pragma omp parallel num_threads(num_thread)
     {
-        printf("Environment variable OMP_NUM_THREADS\n");
+        int id = omp_get_thread_num();
+        printf("Hi I am thread number : %d\n", id);
     }
-
-    omp_set_num_threads(3);
-#pragma omp parallel
-    {
-        printf("Runtime library routine omp_set_num_threads()\n");
-    }
-
-#pragma omp parallel num_threads(4)
-    {
-        printf("Clause num_threads()\n");
-    }
-
-    printf("==========openmp test end=============================\n");
 
     //==============================================================================================================
 
@@ -75,10 +63,10 @@ int main(int argc, char const *argv[])
     PoissonMatrix A(M);
     Boundary B(M, func);
     Startvector X(M, 0.0);
-    Algorithms Algs(M);
+    Algorithms Algs(M, num_thread);
 
-    double timer, start = 0.0, end = 0.0;
-    start = clock();
+    double start_time, end_time;
+    start_time = omp_get_wtime();
 
     /* === Algorithms === */
     if (alg_num == 1)
@@ -104,13 +92,13 @@ int main(int argc, char const *argv[])
     }
 
     /* === Information ===*/
-    end = clock();
-    timer = (end - start) / CLOCKS_PER_SEC;
+    end_time = omp_get_wtime();
+
     cout << "==========\n";
     cout << "Method : " << method << endl;
     cout << "Steps : " << steps << endl;
     cout << "Update Steps : " << Algs.update_step << endl;
-    cout << "Time : " << timer << " (s)" << endl;
+    cout << "Time : " << (end_time - start_time) << " (s)" << endl;
 
     /* === For Plotting ===*/
     //X.WriteToFile();

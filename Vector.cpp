@@ -144,6 +144,7 @@ void print_vector(const vector<double> &v)
     {
         cout << v[i] << " ,";
     }
+    cout << "\n";
 }
 
 /* === Vector Operators ===*/
