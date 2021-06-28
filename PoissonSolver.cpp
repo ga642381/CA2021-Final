@@ -95,12 +95,12 @@ int main(int argc, char const *argv[])
     end_time = omp_get_wtime();
 
     cout << "==========\n";
-    cout << "Thread Number : " << num_thread << endl;
-    cout << "Method : " << method << endl;
-    cout << "Grid Size : " << M << endl;
-    cout << "Steps : " << steps << endl;
-    cout << "Update Steps : " << Algs.update_step << endl;
-    cout << "Time : " << (end_time - start_time) << " (s)" << endl;
+    cout << "* Thread Number : " << num_thread << endl;
+    cout << "* Method : " << method << endl;
+    cout << "* Grid Size : " << M << endl;
+    cout << "* Level Steps (Restriction or Prolongation): " << steps << endl;
+    cout << "* Update Steps (Relaxation): " << Algs.update_step << endl;
+    cout << "* Time : " << (end_time - start_time) << " (s)" << endl;
 
     /* === For Plotting ===*/
     //X.WriteToFile();

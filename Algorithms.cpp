@@ -37,11 +37,12 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
     //  === iterate until converge === //
     if (fixed_step < 0)
     {
+
         double TOL = (r | r) * pow(10, -3);
         while (TOL <= (r | r))
         {
 #pragma omp parallel num_threads(this->num_threads)
-            { //parallel decalare
+            {
 #pragma omp for
                 for (int i = 0; i < n * n; i++) // even cell
                 {
@@ -64,7 +65,6 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
                         r[i] = x[i] - solved[i];
                     }
                 } // end even cell
-
 #pragma omp for
                 for (int i = 0; i < n * n; i++) // odd cell
                 {
@@ -88,9 +88,10 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
                         r[i] = x[i] - solved[i];
                     }
                 } // end odd cell
-            }
-            steps++;
+
+            } // end parallel
             this->update_step++;
+
         } // end while
     }     // end if fixed_step <0
 
@@ -100,7 +101,8 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
         while (this->update_step < fixed_step)
         {
 #pragma omp parallel num_threads(this->num_threads)
-            { //parallel decalare
+            {
+
 #pragma omp for
                 for (int i = 0; i < n * n; i++) // even cell
                 {
@@ -155,7 +157,7 @@ int Algorithms::SORMethod(vector<double> &x, const vector<double> &b, const vect
     //======== end SOR, print and return ========//
     cout << "==========\n";
     double error = cal_error(x, solved);
-    cout << "Error : " << error << endl;
+    cout << "Error (L2): " << error << endl;
     return steps;
     // end parallel decalre
 }
@@ -195,7 +197,7 @@ int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<doubl
         double TOL = pow(10, -3) * (r | r);
         while (TOL <= (r | r))
         {
-            x = Cycle(A, x, b, numberOfGrids, VW, solved);
+            x = Cycle(A, x, b, numberOfGrids, VW);
             r = x - solved;
             steps++;
         }
@@ -206,7 +208,7 @@ int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<doubl
     {
         while (this->update_step < fixed_step)
         {
-            x = Cycle(A, x, b, numberOfGrids, VW, solved);
+            x = Cycle(A, x, b, numberOfGrids, VW);
             r = x - solved;
             steps++;
         }
@@ -217,25 +219,31 @@ int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<doubl
     return steps;
 }
 
-vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<double> &b, int lambda, int theta, const vector<double> &solved)
+vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<double> &b, int level, int w_cycle)
 {
-    // lambda : number of grids
-    // theta : VW
+    // level : number of grids
+    // w_cycle : VW
 
-    // Multigrid : (lambda, theta)
+    // Multigrid : (level, w_cycle)
     // Two-Grid  : (1, 0)
     // V-Cycle   : (2, 0)
     // W-Cycle   : (2, 1)
+
+    // using "recursion" to achieve V-Cycle and W-Cycle
+    // each Cycle contains :
+    // 1. Restriction
+    // 2. Cycle
+    // 3. Cycle (if W-Cycle)
+    // 4. Prolongation
+
+    // when at the bottom level, do SORRelaxation
 
     int dim = x.size(), n = sqrt(dim), N2h = (n + 1) / 2 - 1, dim2h = pow(N2h, 2);
     vector<double> r(dim, 0), E(dim, 0), sol(dim, 0), r2h(dim2h, 0), E2h(dim2h, 0), sol2h(dim2h, 0);
 
     int smoothing_step = 3;
-    if (this->Vcounter == lambda)
+    if (this->Vcounter == level)
     {
-        //JacobiMethod(A, x, b, solved);
-        //SORMethod(x, b, solved);
-        //JacobiRelaxation(A, x, b, 200);
         SORRelaxation(A, x, b, -1);
         return x;
     }
@@ -243,17 +251,22 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
     {
 
         this->Vcounter++;
+        // pre-smooth
         JacobiRelaxation(A, x, b, smoothing_step);
-        r = b - A * x;
-        sol = solved;
-        Restriction(r, r2h, n);
-        Restriction(sol, sol2h, n);
-        E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h);
 
-        if (theta == 1)
-            E2h = Cycle(A, E2h, r2h, lambda, theta, sol2h); // for W-Cycle
-        Interpolation(E2h, E, n);
+        r = b - A * x;
+        Restriction(r, r2h, n);
+
+        E2h = Cycle(A, E2h, r2h, level, w_cycle);
+
+        // for W-Cycle
+        if (w_cycle == 1)
+            E2h = Cycle(A, E2h, r2h, level, w_cycle);
+
+        Prolongation(E2h, E, n);
         x += E;
+
+        // post smooth
         JacobiRelaxation(A, x, b, smoothing_step);
 
         this->Vcounter--;
@@ -393,7 +406,6 @@ void Algorithms::SORRelaxation(Matrix &A, vector<double> &x, const vector<double
     // Relax given steps
     else
     {
-
         for (int k = 0; k < steps; k++) // step
         {
 #pragma omp parallel num_threads(this->num_threads)
@@ -458,7 +470,7 @@ void Algorithms::Restriction(const vector<double> &r, vector<double> &r2h, int n
     }
 }
 
-void Algorithms::Interpolation(const vector<double> &E2h, vector<double> &E, int n)
+void Algorithms::Prolongation(const vector<double> &E2h, vector<double> &E, int n)
 {
     for (int i = 1, k = 0, l = 0; i <= n; i++)
     {

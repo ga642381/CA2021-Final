@@ -110,10 +110,10 @@ public:
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &, int fixed_step);
     int MultiGridMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &, string, int fixed_step);
     void JacobiMethod(Matrix &, vector<double> &, const vector<double> &, const vector<double> &);
-    vector<double> Cycle(Matrix &, vector<double> &, const vector<double> &, int, int, const vector<double> &);
+    vector<double> Cycle(Matrix &, vector<double> &, const vector<double> &, int, int);
     void JacobiRelaxation(Matrix &, vector<double> &, const vector<double> &, int);
     void SORRelaxation(Matrix &, vector<double> &, const vector<double> &, int);
-    void Interpolation(const vector<double> &, vector<double> &, int);
+    void Prolongation(const vector<double> &, vector<double> &, int);
     void Restriction(const vector<double> &, vector<double> &, int);
 };
 
