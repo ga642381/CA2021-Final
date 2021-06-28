@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
     cout << "* Time : " << (end_time - start_time) << " (s)" << endl;
 
     /* === For Plotting ===*/
-    //X.WriteToFile();
+    X.WriteToFile();
 
     return EXIT_SUCCESS;
 }
