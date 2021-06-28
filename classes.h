@@ -104,7 +104,7 @@ private:
 
 public:
     int update_step;
-
+    vector<double> error_array;
     Algorithms(int, int);
     ~Algorithms();
     int SORMethod(vector<double> &, const vector<double> &, const vector<double> &, int fixed_step);

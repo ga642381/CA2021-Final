@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
     [2] Two Grid\n\
     [3] V-Cycle\n\
     [4] W-Cycle\n");
-    printf("    algoritm : ");
+    printf("    algorithm : ");
     scanf("%d", &alg_num);
 
     // Matrix Size
@@ -98,12 +98,12 @@ int main(int argc, char const *argv[])
     cout << "* Thread Number : " << num_thread << endl;
     cout << "* Method : " << method << endl;
     cout << "* Grid Size : " << M << endl;
-    cout << "* Level Steps (Restriction or Prolongation): " << steps << endl;
+    cout << "* Cycle Number: " << steps << endl;
     cout << "* Update Steps (Relaxation): " << Algs.update_step << endl;
     cout << "* Time : " << (end_time - start_time) << " (s)" << endl;
 
     /* === For Plotting ===*/
     X.WriteToFile();
-
+    //print_vector(Algs.error_array);
     return EXIT_SUCCESS;
 }

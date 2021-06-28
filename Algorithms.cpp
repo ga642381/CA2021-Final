@@ -2,6 +2,19 @@
 
 using namespace std;
 
+double cal_error_abs(vector<double> &x, const vector<double> &y)
+{
+    vector<double> r = x - y;
+    int N = (int)(r.size());
+    double error = 0;
+    for (int i = 0; i < N; i++)
+    {
+        error += abs(r[i]);
+    }
+
+    return error / (double)(r.size());
+}
+
 double cal_error(vector<double> &x, const vector<double> &y)
 {
     vector<double> r = x - y;
@@ -194,11 +207,18 @@ int Algorithms::MultiGridMethod(Matrix &A, vector<double> &x, const vector<doubl
     // iterate until converge
     if (fixed_step < 0)
     {
+        // step 0
+        //double error = cal_error_abs(x, solved);
+        //this->error_array.push_back(error);
+
         double TOL = pow(10, -3) * (r | r);
         while (TOL <= (r | r))
         {
             x = Cycle(A, x, b, numberOfGrids, VW);
             r = x - solved;
+
+            // double error = cal_error_abs(x, solved);
+            // this->error_array.push_back(error);
             steps++;
         }
     }
@@ -254,7 +274,7 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
         // pre-smooth
         JacobiRelaxation(A, x, b, smoothing_step);
 
-        r = b - A * x;
+        r = b - A * x; // residual
         Restriction(r, r2h, n);
 
         E2h = Cycle(A, E2h, r2h, level, w_cycle);
@@ -264,7 +284,7 @@ vector<double> Algorithms::Cycle(Matrix &A, vector<double> &x, const vector<doub
             E2h = Cycle(A, E2h, r2h, level, w_cycle);
 
         Prolongation(E2h, E, n);
-        x += E;
+        x += E; // correction
 
         // post smooth
         JacobiRelaxation(A, x, b, smoothing_step);
